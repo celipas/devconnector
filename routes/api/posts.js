@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
 const auth = require('../../middleware/auth');
+const checkObjectId = require('../../middleware/checkObjectId');
 const Post = require('../../models/Post');
 const Profile = require('../../models/Profile');
 const User = require('../../models/User');
@@ -196,36 +197,44 @@ router.post(
 // @route   DELETE api/posts/comments/:id/:comment_id
 // @desc    Delete a comment
 // @access  Private
-router.delete('/comments/:id/:comment_id', auth, async (req, res) => {
-  try {
-    const post = await Post.findById(req.params.id);
-    console.log('post');
-    if (!post) {
-      return res.status(404).json({ msg: 'Post not found' });
-    }
-    //Pull out comment
-    const comment = post.comments.find(
-      comment => comment.id === req.params.comment_id
-    );
-    if (!comment) {
-      return res.status(404).json({ msg: 'Comment does not exist' });
-    }
+router.delete(
+  '/comments/:id/:comment_id',
+  [auth, checkObjectId('id')],
+  async (req, res) => {
+    try {
+      console.log(req.params.id);
+      const post = await Post.findById(req.params.id);
+      if (!post) {
+        return res.status(404).json({ msg: 'Post not found' });
+      }
+      console.log(post);
+      if (!post) {
+        return res.status(404).json({ msg: 'Post not found' });
+      }
+      //Pull out comment
+      const comment = post.comments.find(
+        comment => comment.id === req.params.comment_id
+      );
+      if (!comment) {
+        return res.status(404).json({ msg: 'Comment does not exist' });
+      }
 
-    //Check user
-    if (comment.user.toString() !== req.user.id) {
-      return res.status(401).json({ msg: 'User not authorized' });
-    }
+      //Check user
+      if (comment.user.toString() !== req.user.id) {
+        return res.status(401).json({ msg: 'User not authorized' });
+      }
 
-    //Get remove index
-    const removeIndex = post.comments
-      .map(comment => comment.user.toString())
-      .indexOf(req.user.id);
-    post.comments.splice(removeIndex, 1);
-    await post.save();
-    res.json(post.comments);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ msg: 'Server Error' });
+      //Get remove index
+      const removeIndex = post.comments
+        .map(comment => comment.user.toString())
+        .indexOf(req.user.id);
+      post.comments.splice(removeIndex, 1);
+      await post.save();
+      res.json(post.comments);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json({ msg: 'Server Error' });
+    }
   }
-});
+);
 module.exports = router;
