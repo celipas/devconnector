@@ -4,8 +4,9 @@ import { connect } from 'react-redux';
 import Spinner from '../layout/Spinner';
 import ProfileTop from './ProfileTop';
 import ProfileAbout from './ProfileAbout';
-import ProfileExperence from './ProfileExperence';
+import ProfileExperience from './ProfileExperience';
 import ProfileEducation from './ProfileEducation';
+import ProfileGithub from './ProfileGithub';
 import { getProfileById } from '../../actions/profile';
 import { Link } from 'react-router-dom';
 
@@ -46,7 +47,7 @@ const Profile = ({
               {profile.experience.length > 0 ? (
                 <Fragment>
                   {profile.experience.map(experience => (
-                    <ProfileExperence
+                    <ProfileExperience
                       key={experience._id}
                       experience={experience}
                     />
@@ -72,6 +73,10 @@ const Profile = ({
                 <h4>No education credentials </h4>
               )}
             </div>
+
+            {profile.githubusername && (
+              <ProfileGithub username={profile.githubusername} />
+            )}
           </div>
         </Fragment>
       )}
