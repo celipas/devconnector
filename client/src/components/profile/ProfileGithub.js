@@ -9,7 +9,7 @@ const ProfileGithub = ({ username, getGithubRepos, repos }) => {
     () => {
       getGithubRepos(username);
     },
-    [getGithubRepos]
+    [getGithubRepos, username]
   );
   return (
     <div className="profile-github">
