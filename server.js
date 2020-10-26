@@ -8,7 +8,7 @@ const app = express();
 connectDB();
 
 // Init Middleware
-app.use(express.json({ extended: false }));
+app.use(express.json());
 
 // Define Routes
 app.use('/api/users', require('./routes/api/users'));
@@ -18,7 +18,7 @@ app.use('/api/posts', require('./routes/api/posts'));
 
 // // Serve static assets in product
 if (process.env.NODE_ENV === 'production') {
-  //   //Set static folder
+  //Set static folder
   app.use(express.static('client/build'));
 
   app.get('*', (req, res) => {
